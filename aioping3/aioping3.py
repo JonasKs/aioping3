@@ -107,16 +107,6 @@ def read_ip_header(raw: bytes) -> dict:
     return ip_header
 
 
-async def send_to(socket: socket, packet, dest_addr: str, future):
-    try:
-        socket.sendto(packet, (dest_addr, 0))
-    except BlockingIOError as error:
-        future.cancel(error)
-    except Exception as error:
-        future.set_exception(exception=error)
-    future.set_result(None)
-
-
 async def send_one_ping(sock: socket, dest_addr: str, icmp_id: int, seq: int, size: int) -> Coroutine:
     """Sends one ping to the given destination.
     ICMP Header (bits): type (8), code (8), checksum (16), id (16), sequence (16)
