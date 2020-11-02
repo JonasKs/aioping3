@@ -152,6 +152,7 @@ async def send_one_ping(sock: socket, dest_addr: str, icmp_id: int, seq: int, si
 
     packet = icmp_header + icmp_payload
     # addr = (ip, port). Port is 0 respectively the OS default behavior will be used.
+    # Create callback : https://stackoverflow.com/a/46779849
     return loop.run_in_executor(
         None, partial(sock.sendto, packet, (dest_addr, 0))
     )
@@ -226,9 +227,9 @@ async def receive_one_ping(sock: socket, icmp_id: int, seq: int, timeout: int) -
                         return time_recv - time_sent
                 logger.debug('Uncatched ICMP Packet: %s', icmp_header)
     except asyncio.TimeoutError:
-        loop.remove_reader(socket)
-        loop.remove_writer(socket)
-        socket.close()
+        loop.remove_reader(sock)
+        loop.remove_writer(sock)
+        sock.close()
 
 
 async def ping(
